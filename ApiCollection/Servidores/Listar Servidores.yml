@@ -5,11 +5,33 @@ info:
 
 http:
   method: get
-  url: "{{base_url}}/api/v1/servidores"
+  url: "{{base_url}}/api/v1/servidores?termoBusca=es&ativo=true&margemMinima=500&margemMaxima=5000&page=1&size=20&sort=margemConsignavel,DESC"
   headers:
     - name: Authorization
       value: Bearer {{token}}
       disabled: true
+  params:
+    - name: termoBusca
+      value: es
+      type: query
+    - name: ativo
+      value: "true"
+      type: query
+    - name: margemMinima
+      value: "500"
+      type: query
+    - name: margemMaxima
+      value: "5000"
+      type: query
+    - name: page
+      value: "1"
+      type: query
+    - name: size
+      value: "20"
+      type: query
+    - name: sort
+      value: margemConsignavel,DESC
+      type: query
   auth: inherit
 
 settings:
