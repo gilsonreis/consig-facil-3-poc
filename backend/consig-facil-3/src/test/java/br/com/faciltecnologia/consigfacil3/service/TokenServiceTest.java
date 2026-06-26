@@ -1,7 +1,7 @@
 package br.com.faciltecnologia.consigfacil3.service;
 
 import br.com.faciltecnologia.consigfacil3.domain.Usuario;
-import br.com.faciltecnologia.consigfacil3.utils.UsuarioFactory;
+import br.com.faciltecnologia.consigfacil3.factories.UsuarioFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -25,7 +25,7 @@ class TokenServiceTest {
     @Test
     @DisplayName("Deve embutir o CPF do usuário no subject do token")
     void deveGerarTokenComCpfNoSubject() {
-        Usuario usuario = UsuarioFactory.criarUsuarioValido();
+        Usuario usuario = UsuarioFactory.criarEntidadeValida();
         
         String token = tokenService.gerarToken(usuario);
         
@@ -37,7 +37,7 @@ class TokenServiceTest {
     @Test
     @DisplayName("Deve extrair corretamente o CPF de um token válido")
     void deveExtrairCpfDeTokenValido() {
-        Usuario usuario = UsuarioFactory.criarUsuarioValido();
+        Usuario usuario = UsuarioFactory.criarEntidadeValida();
         String token = tokenService.gerarToken(usuario);
 
         String subject = tokenService.getSubject(token);

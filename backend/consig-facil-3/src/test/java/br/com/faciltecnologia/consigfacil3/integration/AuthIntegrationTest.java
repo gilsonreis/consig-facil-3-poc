@@ -5,7 +5,7 @@ import br.com.faciltecnologia.consigfacil3.domain.Usuario;
 import br.com.faciltecnologia.consigfacil3.repository.ServidorRepository;
 import br.com.faciltecnologia.consigfacil3.repository.UsuarioRepository;
 import br.com.faciltecnologia.consigfacil3.usecases.auth.dto.LoginInput;
-import br.com.faciltecnologia.consigfacil3.utils.UsuarioFactory;
+import br.com.faciltecnologia.consigfacil3.factories.UsuarioFactory;
 import tools.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -74,7 +74,8 @@ class AuthIntegrationTest {
     @DisplayName("Cenário 3 e 4: Login com sucesso e acesso a rota protegida (CPF, Email e Username)")
     void deveRealizarLoginEAAcessarRotaProtegidaComDiferentesIdentificadores() throws Exception {
         // Preparação: Salvar usuário com senha encriptada
-        Usuario usuario = UsuarioFactory.criarUsuarioValido();
+        Usuario usuario = UsuarioFactory.criarEntidadeValida();
+        usuario.setId(null);
         String senhaPura = usuario.getSenha();
         usuario.setSenha(passwordEncoder.encode(senhaPura));
         usuarioRepository.save(usuario);
@@ -111,7 +112,8 @@ class AuthIntegrationTest {
     @DisplayName("Cenário 5: Deve falhar login com senha errada ou usuário inexistente")
     void deveRetornarUnauthorizedParaFalhasDeLogin() throws Exception {
         // 1. Senha errada
-        Usuario usuario = UsuarioFactory.criarUsuarioValido();
+        Usuario usuario = UsuarioFactory.criarEntidadeValida();
+        usuario.setId(null);
         usuario.setSenha(passwordEncoder.encode(usuario.getSenha()));
         usuarioRepository.save(usuario);
 

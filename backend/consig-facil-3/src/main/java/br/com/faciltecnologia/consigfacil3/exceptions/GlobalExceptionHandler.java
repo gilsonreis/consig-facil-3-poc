@@ -41,6 +41,21 @@ public class GlobalExceptionHandler {
     }
 
     /**
+     * Captura violações de regras de negócio.
+     * Retorna HTTP 422 Unprocessable Entity.
+     */
+    @ExceptionHandler(RegraNegocioException.class)
+    public ResponseEntity<StandardError> regraNegocioException(RegraNegocioException e, HttpServletRequest request) {
+        StandardError error = new StandardError(
+                HttpStatus.UNPROCESSABLE_ENTITY.value(),
+                "Violação de Regra de Negócio",
+                e.getMessage(),
+                request.getRequestURI()
+        );
+        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(error);
+    }
+
+    /**
      * Captura falhas de autenticação (Login) do Spring Security.
      * Retorna HTTP 401 Unauthorized.
      */
