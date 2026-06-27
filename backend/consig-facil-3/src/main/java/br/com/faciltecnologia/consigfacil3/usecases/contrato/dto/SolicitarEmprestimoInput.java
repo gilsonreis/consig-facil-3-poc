@@ -6,18 +6,8 @@ import jakarta.validation.constraints.Positive;
 import java.math.BigDecimal;
 
 public record SolicitarEmprestimoInput(
-    @NotNull
-    Long servidorId,
-    
-    @NotNull
-    @Positive
-    BigDecimal valorSolicitado,
-    
-    @NotNull
-    @Positive
-    BigDecimal taxaJurosMes,
-    
-    @NotNull
-    @Min(1)
-    Integer quantidadeParcelas
+    @NotNull Long servidorId,
+    @NotNull @Positive BigDecimal valorSolicitado,
+    @NotNull @Positive BigDecimal taxaJurosMes,
+    @NotNull @Min(1) Integer quantidadeParcelas
 ) {}

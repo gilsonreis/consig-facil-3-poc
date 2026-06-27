@@ -45,9 +45,24 @@ public class SolicitarEmprestimoUseCase {
                     valorParcela, servidor.getMargemConsignavel()));
         }
 
+        Contrato contrato = criarEntidadeContrato(servidor, input, valorParcela);
+        gerarParcelas(contrato);
+
+        Contrato contratoSalvo = contratoRepository.save(contrato);
+        registrarHistorico(contratoSalvo);
+
+        return new EmprestimoOutput(
+                contratoSalvo.getId(),
+                contratoSalvo.getValorParcela(),
+                contratoSalvo.getValorTotalFinanciado(),
+                contratoSalvo.getStatus()
+        );
+    }
+
+    private Contrato criarEntidadeContrato(Servidor servidor, SolicitarEmprestimoInput input, BigDecimal valorParcela) {
         BigDecimal valorTotalFinanciado = valorParcela.multiply(BigDecimal.valueOf(input.quantidadeParcelas()));
 
-        Contrato contrato = Contrato.builder()
+        return Contrato.builder()
                 .servidor(servidor)
                 .valorSolicitado(input.valorSolicitado())
                 .taxaJurosMes(input.taxaJurosMes())
@@ -57,19 +72,6 @@ public class SolicitarEmprestimoUseCase {
                 .status(StatusContrato.DIGITADO)
                 .parcelas(new ArrayList<>())
                 .build();
-
-        gerarParcelas(contrato);
-
-        Contrato contratoSalvo = contratoRepository.save(contrato);
-
-        registrarHistorico(contratoSalvo);
-
-        return new EmprestimoOutput(
-                contratoSalvo.getId(),
-                contratoSalvo.getValorParcela(),
-                contratoSalvo.getValorTotalFinanciado(),
-                contratoSalvo.getStatus()
-        );
     }
 
     private BigDecimal calcularValorParcela(BigDecimal p, BigDecimal taxaMes, int n) {
