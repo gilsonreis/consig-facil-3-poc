@@ -36,6 +36,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @Import(TestcontainersConfiguration.class)
+@org.springframework.test.context.ActiveProfiles("test")
 class SolicitarEmprestimoIntegrationTest {
 
     private MockMvc mockMvc;

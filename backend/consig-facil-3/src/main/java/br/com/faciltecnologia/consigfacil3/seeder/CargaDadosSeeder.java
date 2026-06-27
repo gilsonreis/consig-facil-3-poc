@@ -23,6 +23,7 @@ import java.util.concurrent.ThreadLocalRandom;
 @Component
 @RequiredArgsConstructor
 @Slf4j
+@org.springframework.context.annotation.Profile("!test")
 public class CargaDadosSeeder implements CommandLineRunner {
 
     private final UsuarioRepository usuarioRepository;

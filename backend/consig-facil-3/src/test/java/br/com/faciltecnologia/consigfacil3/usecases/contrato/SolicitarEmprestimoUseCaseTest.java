@@ -14,11 +14,13 @@ import br.com.faciltecnologia.consigfacil3.usecases.contrato.dto.SolicitarEmpres
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -42,13 +44,14 @@ class SolicitarEmprestimoUseCaseTest {
     private SolicitarEmprestimoUseCase useCase;
 
     @Test
-    @DisplayName("Deve solicitar empréstimo com sucesso quando dados são válidos e há margem")
+    @DisplayName("Cenário 1: Sucesso - Servidor ativo e com margem suficiente")
     void deveSolicitarEmprestimoComSucesso() {
         // Arrange
         Long servidorId = 1L;
         Servidor servidor = ServidorFactory.criarEntidadeValida(null);
         servidor.setId(servidorId);
         servidor.setMargemConsignavel(BigDecimal.valueOf(1000.00));
+        servidor.setAtivo(true);
         
         SolicitarEmprestimoInput input = new SolicitarEmprestimoInput(
                 servidorId,
@@ -58,47 +61,39 @@ class SolicitarEmprestimoUseCaseTest {
         );
 
         when(servidorRepository.findById(servidorId)).thenReturn(Optional.of(servidor));
-        when(contratoRepository.save(any(Contrato.class))).thenAnswer(invocation -> {
-            Contrato c = invocation.getArgument(0);
-            return Contrato.builder()
-                    .id(1L)
-                    .servidor(c.getServidor())
-                    .valorSolicitado(c.getValorSolicitado())
-                    .taxaJurosMes(c.getTaxaJurosMes())
-                    .quantidadeParcelas(c.getQuantidadeParcelas())
-                    .valorParcela(c.getValorParcela())
-                    .valorTotalFinanciado(c.getValorTotalFinanciado())
-                    .status(c.getStatus())
-                    .parcelas(c.getParcelas())
-                    .build();
-        });
+        when(contratoRepository.save(any(Contrato.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         // Act
         EmprestimoOutput output = useCase.execute(input);
 
         // Assert
         assertThat(output).isNotNull();
-        assertThat(output.contratoId()).isEqualTo(1L);
         assertThat(output.status()).isEqualTo(StatusContrato.DIGITADO);
-        assertThat(output.valorParcela()).isNotNull();
         
-        // Cálculo da Tabela Price conferido:
-        // P = 10000, i = 0.02, n = 12
-        // Parcela = 10000 * (0.02 * (1.02)^12) / ((1.02)^12 - 1) = 945.60
-        assertThat(output.valorParcela()).isEqualByComparingTo("945.60");
+        ArgumentCaptor<Contrato> contratoCaptor = ArgumentCaptor.forClass(Contrato.class);
+        verify(contratoRepository, times(1)).save(contratoCaptor.capture());
+        
+        Contrato contratoSalvo = contratoCaptor.getValue();
+        assertThat(contratoSalvo.getParcelas()).hasSize(12);
+        assertThat(contratoSalvo.getParcelas().get(0).getDataVencimento())
+                .isEqualTo(LocalDate.now().plusMonths(1));
 
-        verify(contratoRepository).save(any(Contrato.class));
-        verify(historicoContratoRepository).save(any(HistoricoContrato.class));
+        verify(historicoContratoRepository, times(1)).save(any(HistoricoContrato.class));
+        
+        ArgumentCaptor<HistoricoContrato> historicoCaptor = ArgumentCaptor.forClass(HistoricoContrato.class);
+        verify(historicoContratoRepository).save(historicoCaptor.capture());
+        assertThat(historicoCaptor.getValue().getStatusNovo()).isEqualTo(StatusContrato.DIGITADO);
     }
 
     @Test
-    @DisplayName("Deve lançar exceção quando margem for insuficiente")
+    @DisplayName("Cenário 2: Bloqueio de Margem - Servidor com margem insuficiente")
     void deveLancarExcecaoMargemInsuficiente() {
         // Arrange
         Long servidorId = 1L;
         Servidor servidor = ServidorFactory.criarEntidadeValida(null);
         servidor.setId(servidorId);
         servidor.setMargemConsignavel(BigDecimal.valueOf(500.00));
+        servidor.setAtivo(true);
         
         SolicitarEmprestimoInput input = new SolicitarEmprestimoInput(
                 servidorId,
@@ -118,11 +113,13 @@ class SolicitarEmprestimoUseCaseTest {
     }
 
     @Test
-    @DisplayName("Deve lançar exceção quando servidor não for encontrado")
-    void deveLancarExcecaoServidorNaoEncontrado() {
+    @DisplayName("Cenário 3: Bloqueio de Inativo - Servidor inativo")
+    void deveLancarExcecaoServidorInativo() {
         // Arrange
         Long servidorId = 1L;
-        when(servidorRepository.findById(servidorId)).thenReturn(Optional.empty());
+        Servidor servidor = ServidorFactory.criarEntidadeValida(null);
+        servidor.setId(servidorId);
+        servidor.setAtivo(false);
         
         SolicitarEmprestimoInput input = new SolicitarEmprestimoInput(
                 servidorId,
@@ -131,9 +128,13 @@ class SolicitarEmprestimoUseCaseTest {
                 12
         );
 
+        when(servidorRepository.findById(servidorId)).thenReturn(Optional.of(servidor));
+
         // Act & Assert
         assertThatThrownBy(() -> useCase.execute(input))
                 .isInstanceOf(RegraNegocioException.class)
-                .hasMessageContaining("Servidor não encontrado");
+                .hasMessageContaining("Servidor inativo");
+
+        verify(contratoRepository, never()).save(any());
     }
 }

@@ -12,7 +12,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "contratos")
-@Getter
+@Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
