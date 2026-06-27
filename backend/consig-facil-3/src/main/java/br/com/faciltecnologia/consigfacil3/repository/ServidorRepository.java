@@ -10,4 +10,5 @@ import java.util.List;
 public interface ServidorRepository extends JpaRepository<Servidor, Long>, JpaSpecificationExecutor<Servidor> {
     boolean existsByMatricula(String matricula);
     List<Servidor> findByUsuarioId(Long usuarioId);
+    long countByAtivoTrue();
 }
