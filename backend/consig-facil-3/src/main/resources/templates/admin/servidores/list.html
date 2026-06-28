@@ -58,29 +58,22 @@
                             <table class="table table-bordered table-striped table-hover align-middle">
                                 <thead class="table-dark">
                                     <tr>
-                                        <th>Matrícula</th>
                                         <th>Nome</th>
                                         <th>CPF</th>
-                                        <th>Margem</th>
-                                        <th class="text-center">Status</th>
+                                        <th class="text-center">Qtd de Matrículas</th>
                                         <th class="text-center">Ações</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr th:each="servidor : ${servidoresPage.content}" 
-                                        th:onclick="|window.location.href='@{/admin/servidores/{id}/editar(id=${servidor.id})}'|"
-                                        style="cursor: pointer;">
-                                        <td th:text="${servidor.matricula}">-</td>
-                                        <td th:text="${servidor.nomeUsuario}">-</td>
-                                        <td th:text="${servidor.cpfUsuario}">-</td>
-                                        <td th:text="${#numbers.formatCurrency(servidor.margemConsignavel)}">-</td>
-                                        <td class="text-center">
-                                            <span th:if="${servidor.ativo}" class="badge bg-success">Ativo</span>
-                                            <span th:unless="${servidor.ativo}" class="badge bg-danger">Inativo</span>
-                                        </td>
+                                    <tr th:each="servidor : ${servidoresPage.content}">
+                                        <td th:text="${servidor.nome}">-</td>
+                                        <td th:text="${servidor.cpf}">-</td>
+                                        <td class="text-center" th:text="${servidor.quantidadeMatriculas}">0</td>
                                         <td class="text-center">
                                             <button class="btn btn-sm btn-outline-info me-1" 
                                                     title="Visualizar"
+                                                    th:attr="hx-get=@{/admin/servidores/{cpf}/matriculas(cpf=${servidor.cpf})}"
+                                                    hx-target="#modalVisualizarBody"
                                                     data-bs-toggle="modal" 
                                                     data-bs-target="#modalVisualizar"
                                                     onclick="event.stopPropagation();">
@@ -94,7 +87,7 @@
                                         </td>
                                     </tr>
                                     <tr th:if="${servidoresPage.isEmpty()}">
-                                        <td colspan="6" class="text-center py-4 text-muted">Nenhum servidor encontrado.</td>
+                                        <td colspan="4" class="text-center py-4 text-muted">Nenhum servidor encontrado.</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -154,7 +147,7 @@
                         <h5 class="modal-title" id="modalVisualizarLabel">Detalhes do Servidor</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
-                    <div class="modal-body">
+                    <div class="modal-body" id="modalVisualizarBody">
                         <p class="text-center text-muted">Carregando detalhes...</p>
                     </div>
                     <div class="modal-footer">

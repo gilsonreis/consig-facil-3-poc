@@ -1,0 +1,30 @@
+<div th:fragment="conteudo">
+    <div class="mb-3">
+        <p><strong>Nome:</strong> <span th:text="${nome}">-</span></p>
+        <p><strong>CPF:</strong> <span th:text="${cpf}">-</span></p>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-sm table-hover">
+            <thead class="table-light">
+                <tr>
+                    <th>Matrícula</th>
+                    <th>Margem</th>
+                    <th class="text-center">Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="matricula : ${matriculas}">
+                    <td th:text="${matricula.matricula}">-</td>
+                    <td th:text="${#numbers.formatCurrency(matricula.margemConsignavel)}">-</td>
+                    <td class="text-center">
+                        <span th:if="${matricula.ativo}" class="badge bg-success">Ativo</span>
+                        <span th:unless="${matricula.ativo}" class="badge bg-danger">Inativo</span>
+                    </td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(matriculas)}">
+                    <td colspan="3" class="text-center text-muted">Nenhuma matrícula encontrada.</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

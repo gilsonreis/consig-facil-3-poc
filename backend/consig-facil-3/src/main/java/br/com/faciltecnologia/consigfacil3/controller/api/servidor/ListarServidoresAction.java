@@ -2,7 +2,7 @@ package br.com.faciltecnologia.consigfacil3.controller.api.servidor;
 
 import br.com.faciltecnologia.consigfacil3.usecases.servidor.ListarServidoresUseCase;
 import br.com.faciltecnologia.consigfacil3.usecases.servidor.dto.ServidorFiltro;
-import br.com.faciltecnologia.consigfacil3.usecases.servidor.dto.ServidorOutput;
+import br.com.faciltecnologia.consigfacil3.usecases.servidor.dto.ServidorResumoOutput;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -20,9 +20,9 @@ public class ListarServidoresAction {
     private final ListarServidoresUseCase listarServidoresUseCase;
 
     @GetMapping
-    public ResponseEntity<Page<ServidorOutput>> execute(
+    public ResponseEntity<Page<ServidorResumoOutput>> execute(
             ServidorFiltro filtro,
-            @PageableDefault(page = 0, size = 10, sort = "dataCriacao", direction = Sort.Direction.DESC) Pageable pageable) {
+            @PageableDefault(page = 0, size = 10) Pageable pageable) {
         return ResponseEntity.ok(listarServidoresUseCase.execute(filtro, pageable));
     }
 }
