@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{admin/layout/master :: layout(~{::main})}">
+<body>
+    <main>
+        <div class="container-fluid px-4">
+            <nav aria-label="breadcrumb" class="mt-4">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a th:href="@{/admin/dashboard}">Home</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Servidores</li>
+                </ol>
+            </nav>
+
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-light d-flex justify-content-between align-items-center py-3">
+                    <h5 class="mb-0 text-primary fw-bold">Listagem de Servidores</h5>
+                </div>
+                <div class="card-body">
+                    <!-- Toolbar -->
+                    <div class="row mb-4">
+                        <div class="col-md-8">
+                            <form th:action="@{/admin/servidores}" method="GET" class="row g-3"
+                                  hx-get="/admin/servidores" 
+                                  hx-target="#tabela-container" 
+                                  hx-push-url="true"
+                                  hx-trigger="submit, change from:#sizeSelect">
+                                <div class="col-auto">
+                                    <div class="input-group">
+                                        <input type="text" name="search" class="form-control" placeholder="Buscar por nome, CPF ou matrícula..." th:value="${search}">
+                                        <button class="btn btn-outline-primary" type="submit">
+                                            <i class="bi bi-search"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="col-auto">
+                                    <div class="input-group">
+                                        <label class="input-group-text" for="sizeSelect">Exibir</label>
+                                        <select class="form-select" id="sizeSelect" name="size">
+                                            <option value="10" th:selected="${currentSize == 10}">10</option>
+                                            <option value="25" th:selected="${currentSize == 25}">25</option>
+                                            <option value="50" th:selected="${currentSize == 50}">50</option>
+                                            <option value="100" th:selected="${currentSize == 100}">100</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="col-md-4 text-end">
+                            <a th:href="@{/admin/servidores/novo}" class="btn btn-primary">
+                                <i class="bi bi-person-plus-fill me-2"></i>Novo Servidor
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Table Container (Fragment) -->
+                    <div id="tabela-container" th:fragment="tabela-fragment">
+                        <!-- Table -->
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-striped table-hover align-middle">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>Matrícula</th>
+                                        <th>Nome</th>
+                                        <th>CPF</th>
+                                        <th>Margem</th>
+                                        <th class="text-center">Status</th>
+                                        <th class="text-center">Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="servidor : ${servidoresPage.content}" 
+                                        th:onclick="|window.location.href='@{/admin/servidores/{id}/editar(id=${servidor.id})}'|"
+                                        style="cursor: pointer;">
+                                        <td th:text="${servidor.matricula}">-</td>
+                                        <td th:text="${servidor.nomeUsuario}">-</td>
+                                        <td th:text="${servidor.cpfUsuario}">-</td>
+                                        <td th:text="${#numbers.formatCurrency(servidor.margemConsignavel)}">-</td>
+                                        <td class="text-center">
+                                            <span th:if="${servidor.ativo}" class="badge bg-success">Ativo</span>
+                                            <span th:unless="${servidor.ativo}" class="badge bg-danger">Inativo</span>
+                                        </td>
+                                        <td class="text-center">
+                                            <button class="btn btn-sm btn-outline-info me-1" 
+                                                    title="Visualizar"
+                                                    data-bs-toggle="modal" 
+                                                    data-bs-target="#modalVisualizar"
+                                                    onclick="event.stopPropagation();">
+                                                <i class="bi bi-eye"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-danger" 
+                                                    title="Excluir"
+                                                    onclick="event.stopPropagation(); if(confirm('Deseja realmente excluir este servidor?')) { /* action logic here */ }">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr th:if="${servidoresPage.isEmpty()}">
+                                        <td colspan="6" class="text-center py-4 text-muted">Nenhum servidor encontrado.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Footer / Pagination -->
+                        <div class="d-flex justify-content-between align-items-center mt-3" th:if="${!servidoresPage.isEmpty()}">
+                            <div>
+                                <p class="mb-0 text-muted">
+                                    Mostrando <span class="fw-bold" th:text="${servidoresPage.number * servidoresPage.size + 1}">1</span> a 
+                                    <span class="fw-bold" th:text="${servidoresPage.number * servidoresPage.size + servidoresPage.numberOfElements}">10</span> de 
+                                    <span class="fw-bold" th:text="${servidoresPage.totalElements}">100</span> registros
+                                </p>
+                            </div>
+                            <nav aria-label="Page navigation">
+                                <ul class="pagination mb-0">
+                                    <li class="page-item" th:classappend="${servidoresPage.first} ? 'disabled'">
+                                        <a class="page-link" href="javascript:void(0)"
+                                           th:attr="hx-get=@{/admin/servidores(page=${servidoresPage.number - 1}, size=${currentSize}, search=${search})}"
+                                           hx-target="#tabela-container" 
+                                           hx-push-url="true"
+                                           aria-label="Previous">
+                                            <span aria-hidden="true">&laquo;</span>
+                                        </a>
+                                    </li>
+                                    
+                                    <li class="page-item" th:each="i : ${#numbers.sequence(0, servidoresPage.totalPages - 1)}"
+                                        th:classappend="${i == servidoresPage.number} ? 'active'">
+                                        <a class="page-link" href="javascript:void(0)" th:text="${i + 1}"
+                                           th:attr="hx-get=@{/admin/servidores(page=${i}, size=${currentSize}, search=${search})}"
+                                           hx-target="#tabela-container" 
+                                           hx-push-url="true">1</a>
+                                    </li>
+
+                                    <li class="page-item" th:classappend="${servidoresPage.last} ? 'disabled'">
+                                        <a class="page-link" href="javascript:void(0)"
+                                           th:attr="hx-get=@{/admin/servidores(page=${servidoresPage.number + 1}, size=${currentSize}, search=${search})}"
+                                           hx-target="#tabela-container" 
+                                           hx-push-url="true"
+                                           aria-label="Next">
+                                            <span aria-hidden="true">&raquo;</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </nav>
+                        </div>
+                    </div> <!-- End Fragment Area -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal Visualizar -->
+        <div class="modal fade" id="modalVisualizar" tabindex="-1" aria-labelledby="modalVisualizarLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="modalVisualizarLabel">Detalhes do Servidor</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p class="text-center text-muted">Carregando detalhes...</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+</html>
