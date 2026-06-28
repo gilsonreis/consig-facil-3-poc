@@ -23,6 +23,7 @@
                                   hx-target="#tabela-container" 
                                   hx-push-url="true"
                                   hx-trigger="submit, change from:#sizeSelect">
+                                <input type="hidden" name="sort" th:value="${sortField + ',' + sortDir}">
                                 <div class="col-auto">
                                     <div class="input-group">
                                         <input type="text" name="search" class="form-control" placeholder="Buscar por nome, CPF ou matrícula..." th:value="${search}">
@@ -58,8 +59,20 @@
                             <table class="table table-bordered table-striped table-hover align-middle">
                                 <thead class="table-dark">
                                     <tr>
-                                        <th>Nome</th>
-                                        <th>CPF</th>
+                                        <th style="cursor: pointer;"
+                                            th:attr="hx-get=@{/admin/servidores(search=${search}, size=${currentSize}, sort='u.nome,' + (${sortField == 'u.nome' and sortDir == 'asc'} ? 'desc' : 'asc'))}"
+                                            hx-target="#tabela-container"
+                                            hx-push-url="true">
+                                            Nome
+                                            <i th:if="${sortField == 'u.nome'}" th:class="${sortDir == 'asc' ? 'bi bi-arrow-up' : 'bi bi-arrow-down'}"></i>
+                                        </th>
+                                        <th style="cursor: pointer;"
+                                            th:attr="hx-get=@{/admin/servidores(search=${search}, size=${currentSize}, sort='u.cpf,' + (${sortField == 'u.cpf' and sortDir == 'asc'} ? 'desc' : 'asc'))}"
+                                            hx-target="#tabela-container"
+                                            hx-push-url="true">
+                                            CPF
+                                            <i th:if="${sortField == 'u.cpf'}" th:class="${sortDir == 'asc' ? 'bi bi-arrow-up' : 'bi bi-arrow-down'}"></i>
+                                        </th>
                                         <th class="text-center">Qtd de Matrículas</th>
                                         <th class="text-center">Ações</th>
                                     </tr>
@@ -106,7 +119,7 @@
                                 <ul class="pagination mb-0">
                                     <li class="page-item" th:classappend="${servidoresPage.first} ? 'disabled'">
                                         <a class="page-link" href="javascript:void(0)"
-                                           th:attr="hx-get=@{/admin/servidores(page=${servidoresPage.number - 1}, size=${currentSize}, search=${search})}"
+                                           th:attr="hx-get=@{/admin/servidores(page=${servidoresPage.number - 1}, size=${currentSize}, search=${search}, sort=${sortField} + ',' + ${sortDir})}"
                                            hx-target="#tabela-container" 
                                            hx-push-url="true"
                                            aria-label="Previous">
@@ -117,14 +130,14 @@
                                     <li class="page-item" th:each="i : ${#numbers.sequence(0, servidoresPage.totalPages - 1)}"
                                         th:classappend="${i == servidoresPage.number} ? 'active'">
                                         <a class="page-link" href="javascript:void(0)" th:text="${i + 1}"
-                                           th:attr="hx-get=@{/admin/servidores(page=${i}, size=${currentSize}, search=${search})}"
+                                           th:attr="hx-get=@{/admin/servidores(page=${i}, size=${currentSize}, search=${search}, sort=${sortField} + ',' + ${sortDir})}"
                                            hx-target="#tabela-container" 
                                            hx-push-url="true">1</a>
                                     </li>
 
                                     <li class="page-item" th:classappend="${servidoresPage.last} ? 'disabled'">
                                         <a class="page-link" href="javascript:void(0)"
-                                           th:attr="hx-get=@{/admin/servidores(page=${servidoresPage.number + 1}, size=${currentSize}, search=${search})}"
+                                           th:attr="hx-get=@{/admin/servidores(page=${servidoresPage.number + 1}, size=${currentSize}, search=${search}, sort=${sortField} + ',' + ${sortDir})}"
                                            hx-target="#tabela-container" 
                                            hx-push-url="true"
                                            aria-label="Next">

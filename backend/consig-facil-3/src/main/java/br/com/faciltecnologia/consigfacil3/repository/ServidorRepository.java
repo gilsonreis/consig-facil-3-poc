@@ -19,9 +19,9 @@ public interface ServidorRepository extends JpaRepository<Servidor, Long>, JpaSp
 
     @Query("SELECT new br.com.faciltecnologia.consigfacil3.usecases.servidor.dto.ServidorResumoOutput(u.nome, u.cpf, COUNT(s)) " +
            "FROM Servidor s JOIN s.usuario u " +
-           "WHERE (:search IS NULL OR LOWER(u.nome) LIKE LOWER(CONCAT('%', :search, '%')) " +
-           "OR LOWER(u.cpf) LIKE LOWER(CONCAT('%', :search, '%')) " +
-           "OR LOWER(s.matricula) LIKE LOWER(CONCAT('%', :search, '%'))) " +
+           "WHERE (:search IS NULL OR LOWER(u.nome) LIKE LOWER(CONCAT('%', CAST(:search AS string), '%')) " +
+           "OR LOWER(u.cpf) LIKE LOWER(CONCAT('%', CAST(:search AS string), '%')) " +
+           "OR LOWER(s.matricula) LIKE LOWER(CONCAT('%', CAST(:search AS string), '%'))) " +
            "GROUP BY u.cpf, u.nome")
     Page<ServidorResumoOutput> findResumoGroupedByCpf(@Param("search") String search, Pageable pageable);
 
