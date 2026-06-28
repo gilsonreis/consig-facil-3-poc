@@ -1,4 +1,4 @@
-package br.com.faciltecnologia.consigfacil3.controller.web.auth;
+package br.com.faciltecnologia.consigfacil3.controller.web.admin.auth;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;

@@ -1,0 +1,36 @@
+<div th:fragment="conteudo" class="row g-3" th:object="${cadastrarServidorInput}">
+    <div class="col-12 mt-2">
+        <span th:if="${usuarioExistente == true}" class="badge bg-success mb-2">
+            <i class="bi bi-check-circle-fill me-1"></i> Usuário Encontrado
+        </span>
+        <span th:if="${usuarioExistente == false}" class="badge bg-primary mb-2">
+            <i class="bi bi-person-plus-fill me-1"></i> Novo Usuário
+        </span>
+    </div>
+
+    <div class="col-md-6">
+        <label for="nome" class="form-label fw-bold">Nome Completo</label>
+        <input type="text" 
+               id="nome" 
+               name="nome" 
+               class="form-control" 
+               placeholder="Nome do servidor"
+               required
+               th:value="${usuario != null ? usuario.nome : cadastrarServidorInput.nome}"
+               th:readonly="${usuarioExistente == true}">
+        <div class="invalid-feedback d-block" th:if="${#fields != null && #fields.hasErrors('nome')}" th:errors="*{nome}"></div>
+    </div>
+
+    <div class="col-md-6">
+        <label for="email" class="form-label fw-bold">E-mail</label>
+        <input type="email" 
+               id="email" 
+               name="email" 
+               class="form-control" 
+               placeholder="exemplo@email.com"
+               required
+               th:value="${usuario != null ? usuario.email : cadastrarServidorInput.email}"
+               th:readonly="${usuarioExistente == true}">
+        <div class="invalid-feedback d-block" th:if="${#fields != null && #fields.hasErrors('email')}" th:errors="*{email}"></div>
+    </div>
+</div>
