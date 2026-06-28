@@ -1,4 +1,4 @@
-package br.com.faciltecnologia.consigfacil3.controller.servidor;
+package br.com.faciltecnologia.consigfacil3.controller.api.servidor;
 
 import br.com.faciltecnologia.consigfacil3.usecases.servidor.CriarServidorUseCase;
 import br.com.faciltecnologia.consigfacil3.usecases.servidor.dto.CriarServidorInput;

@@ -1,4 +1,4 @@
-package br.com.faciltecnologia.consigfacil3.controller.contrato;
+package br.com.faciltecnologia.consigfacil3.controller.api.contrato;
 
 import br.com.faciltecnologia.consigfacil3.domain.dto.ContratoResumoOutput;
 import br.com.faciltecnologia.consigfacil3.usecases.contrato.ListarContratosServidorUseCase;

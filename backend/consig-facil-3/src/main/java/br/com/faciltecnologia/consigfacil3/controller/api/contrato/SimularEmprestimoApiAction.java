@@ -1,7 +1,7 @@
-package br.com.faciltecnologia.consigfacil3.controller.contrato;
+package br.com.faciltecnologia.consigfacil3.controller.api.contrato;
 
-import br.com.faciltecnologia.consigfacil3.usecases.contrato.SolicitarEmprestimoUseCase;
-import br.com.faciltecnologia.consigfacil3.usecases.contrato.dto.EmprestimoOutput;
+import br.com.faciltecnologia.consigfacil3.domain.dto.SimulacaoOutput;
+import br.com.faciltecnologia.consigfacil3.usecases.contrato.SimularEmprestimoUseCase;
 import br.com.faciltecnologia.consigfacil3.usecases.contrato.dto.SolicitarEmprestimoInput;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -14,12 +14,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/contratos")
-public class SolicitarEmprestimoApiAction {
+public class SimularEmprestimoApiAction {
 
-    private final SolicitarEmprestimoUseCase useCase;
+    private final SimularEmprestimoUseCase useCase;
 
-    @PostMapping("/solicitar")
-    public ResponseEntity<EmprestimoOutput> execute(@Valid @RequestBody SolicitarEmprestimoInput input) {
+    @PostMapping("/simular")
+    public ResponseEntity<SimulacaoOutput> execute(@Valid @RequestBody SolicitarEmprestimoInput input) {
         return ResponseEntity.ok(useCase.execute(input));
     }
 }

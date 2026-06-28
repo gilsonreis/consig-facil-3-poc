@@ -1,4 +1,4 @@
-package br.com.faciltecnologia.consigfacil3.controller.dashboard;
+package br.com.faciltecnologia.consigfacil3.controller.api.dashboard;
 
 import br.com.faciltecnologia.consigfacil3.usecases.dashboard.dto.DashboardResumoOutput;
 import br.com.faciltecnologia.consigfacil3.usecases.dashboard.GerarResumoDashboardUseCase;

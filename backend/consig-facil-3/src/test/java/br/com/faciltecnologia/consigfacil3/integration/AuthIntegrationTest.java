@@ -2,6 +2,8 @@ package br.com.faciltecnologia.consigfacil3.integration;
 
 import br.com.faciltecnologia.consigfacil3.TestcontainersConfiguration;
 import br.com.faciltecnologia.consigfacil3.domain.Usuario;
+import br.com.faciltecnologia.consigfacil3.repository.ContratoRepository;
+import br.com.faciltecnologia.consigfacil3.repository.HistoricoContratoRepository;
 import br.com.faciltecnologia.consigfacil3.repository.ServidorRepository;
 import br.com.faciltecnologia.consigfacil3.repository.UsuarioRepository;
 import br.com.faciltecnologia.consigfacil3.usecases.auth.dto.LoginInput;
@@ -42,6 +44,12 @@ class AuthIntegrationTest {
     private ServidorRepository servidorRepository;
 
     @Autowired
+    private ContratoRepository contratoRepository;
+
+    @Autowired
+    private HistoricoContratoRepository historicoContratoRepository;
+
+    @Autowired
     private PasswordEncoder passwordEncoder;
 
     @Autowired
@@ -52,6 +60,9 @@ class AuthIntegrationTest {
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
                 .apply(springSecurity())
                 .build();
+        
+        historicoContratoRepository.deleteAll();
+        contratoRepository.deleteAll();
         servidorRepository.deleteAll();
         usuarioRepository.deleteAll();
     }
@@ -59,14 +70,14 @@ class AuthIntegrationTest {
     @Test
     @DisplayName("Cenário 1: Deve barrar acesso a rota protegida sem token")
     void deveRetornarForbiddenSemToken() throws Exception {
-        mockMvc.perform(get("/api/v1/hello").contextPath("/api/v1"))
+        mockMvc.perform(get("/api/v1/hello"))
                 .andExpect(status().isForbidden());
     }
 
     @Test
     @DisplayName("Cenário 2: Deve barrar acesso com token inválido")
     void deveRetornarForbiddenComTokenInvalido() throws Exception {
-        mockMvc.perform(get("/api/v1/hello").contextPath("/api/v1")
+        mockMvc.perform(get("/api/v1/hello")
                         .header("Authorization", "Bearer token_inventado"))
                 .andExpect(status().isForbidden());
     }
@@ -94,7 +105,7 @@ class AuthIntegrationTest {
     private void testarLoginESucesso(String identificador, String senha) throws Exception {
         LoginInput loginInput = new LoginInput(identificador, senha);
 
-        String response = mockMvc.perform(post("/api/v1/auth/login").contextPath("/api/v1")
+        String response = mockMvc.perform(post("/api/v1/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(loginInput)))
                 .andExpect(status().isOk())
@@ -104,7 +115,7 @@ class AuthIntegrationTest {
         String token = objectMapper.readTree(response).get("token").asText();
 
         // Acesso à rota protegida
-        mockMvc.perform(get("/api/v1/hello").contextPath("/api/v1")
+        mockMvc.perform(get("/api/v1/hello")
                         .header("Authorization", "Bearer " + token))
                 .andExpect(status().isOk());
     }
@@ -120,7 +131,7 @@ class AuthIntegrationTest {
 
         LoginInput loginSenhaErrada = new LoginInput(usuario.getCpf(), "senha_incorreta");
 
-        mockMvc.perform(post("/api/v1/auth/login").contextPath("/api/v1")
+        mockMvc.perform(post("/api/v1/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(loginSenhaErrada)))
                 .andExpect(status().isUnauthorized())
@@ -131,7 +142,7 @@ class AuthIntegrationTest {
         // 2. Identificador inexistente
         LoginInput loginInexistente = new LoginInput("99999999999", "senha");
 
-        mockMvc.perform(post("/api/v1/auth/login").contextPath("/api/v1")
+        mockMvc.perform(post("/api/v1/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(loginInexistente)))
                 .andExpect(status().isUnauthorized());

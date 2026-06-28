@@ -1,4 +1,4 @@
-package br.com.faciltecnologia.consigfacil3.controller.auth;
+package br.com.faciltecnologia.consigfacil3.controller.api.auth;
 
 import br.com.faciltecnologia.consigfacil3.usecases.auth.LoginUseCase;
 import br.com.faciltecnologia.consigfacil3.usecases.auth.dto.LoginInput;

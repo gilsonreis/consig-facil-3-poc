@@ -5,6 +5,8 @@ import br.com.faciltecnologia.consigfacil3.domain.Servidor;
 import br.com.faciltecnologia.consigfacil3.domain.Usuario;
 import br.com.faciltecnologia.consigfacil3.factories.ServidorFactory;
 import br.com.faciltecnologia.consigfacil3.factories.UsuarioFactory;
+import br.com.faciltecnologia.consigfacil3.repository.ContratoRepository;
+import br.com.faciltecnologia.consigfacil3.repository.HistoricoContratoRepository;
 import br.com.faciltecnologia.consigfacil3.repository.spec.ServidorSpecification;
 import br.com.faciltecnologia.consigfacil3.usecases.servidor.dto.ServidorFiltro;
 import org.junit.jupiter.api.BeforeEach;
@@ -33,8 +35,16 @@ class ServidorRepositoryIT {
     @Autowired
     private UsuarioRepository usuarioRepository;
 
+    @Autowired
+    private ContratoRepository contratoRepository;
+
+    @Autowired
+    private HistoricoContratoRepository historicoContratoRepository;
+
     @BeforeEach
     void setupMassaDeDados() {
+        historicoContratoRepository.deleteAll();
+        contratoRepository.deleteAll();
         servidorRepository.deleteAll();
         usuarioRepository.deleteAll();
 

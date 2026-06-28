@@ -1,4 +1,4 @@
-package br.com.faciltecnologia.consigfacil3.controller;
+package br.com.faciltecnologia.consigfacil3.controller.api;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;

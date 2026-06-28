@@ -93,7 +93,7 @@ class SolicitarEmprestimoIntegrationTest {
 
         // Obter Token
         LoginInput loginInput = new LoginInput(admin.getCpf(), senhaPura);
-        String response = mockMvc.perform(post("/api/v1/auth/login").contextPath("/api/v1")
+        String response = mockMvc.perform(post("/api/v1/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(loginInput)))
                 .andExpect(status().isOk())
@@ -112,7 +112,7 @@ class SolicitarEmprestimoIntegrationTest {
                 12
         );
 
-        mockMvc.perform(post("/api/v1/contratos/solicitar").contextPath("/api/v1")
+        mockMvc.perform(post("/api/v1/contratos/solicitar")
                         .header("Authorization", "Bearer " + tokenAdmin)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(input)))
@@ -132,7 +132,7 @@ class SolicitarEmprestimoIntegrationTest {
                 12
         );
 
-        mockMvc.perform(post("/api/v1/contratos/solicitar").contextPath("/api/v1")
+        mockMvc.perform(post("/api/v1/contratos/solicitar")
                         .header("Authorization", "Bearer " + tokenAdmin)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(input)))
