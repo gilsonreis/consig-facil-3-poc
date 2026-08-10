@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{admin/layout/master :: layout(~{::main})}">
+<body>
+    <main>
+        <div class="container-fluid px-4">
+            <nav aria-label="breadcrumb" class="mt-4">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a th:href="@{/admin/dashboard}">Home</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Contratos</li>
+                </ol>
+            </nav>
+
+            <div class="card mb-4 border-0">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0 text-dark fw-bold">Relatório de Contratos</h5>
+                </div>
+                <div class="card-body">
+                    <!-- Form de Filtros -->
+                    <form id="form-filtros" hx-get="/admin/contratos" hx-target="#tabela-container" hx-push-url="true" class="mb-4">
+                        <!-- Mantém ordenação e página inicial -->
+                        <input type="hidden" name="sort" th:value="${sortField + ',' + sortDir}">
+                        <input type="hidden" name="page" value="0">
+
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <label for="servidorInput" class="form-label fw-semibold">Servidor (Nome ou CPF)</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0"><i class="bi bi-person text-muted"></i></span>
+                                    <input type="text" id="servidorInput" name="servidor" class="form-control bg-light border-start-0" 
+                                           placeholder="Buscar por nome ou CPF..." th:value="${servidor}">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="matriculaInput" class="form-label fw-semibold">Matrícula</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0"><i class="bi bi-card-text text-muted"></i></span>
+                                    <input type="text" id="matriculaInput" name="matricula" class="form-control bg-light border-start-0" 
+                                           placeholder="Número da matrícula..." th:value="${matricula}">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Intervalo de Data de Solicitação</label>
+                                <div class="row g-2">
+                                    <div class="col">
+                                        <input type="date" name="dataInicio" class="form-control bg-light" 
+                                               th:value="${dataInicio}" placeholder="Data Início">
+                                    </div>
+                                    <div class="col">
+                                        <input type="date" name="dataFim" class="form-control bg-light" 
+                                               th:value="${dataFim}" placeholder="Data Fim">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Faixa de Valor Solicitado</label>
+                                <div class="row g-2">
+                                    <div class="col">
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-light">Min R$</span>
+                                            <input type="number" name="valorMin" step="0.01" class="form-control bg-light" 
+                                                   th:value="${valorMin}" placeholder="0,00">
+                                        </div>
+                                    </div>
+                                    <div class="col">
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-light">Max R$</span>
+                                            <input type="number" name="valorMax" step="0.01" class="form-control bg-light" 
+                                                   th:value="${valorMax}" placeholder="0,00">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-2">
+                            <button type="reset" class="btn btn-outline-secondary px-4" 
+                                    hx-get="/admin/contratos" 
+                                    hx-target="#tabela-container" 
+                                    hx-push-url="true">
+                                <i class="bi bi-x-circle me-2"></i>Limpar Filtros
+                            </button>
+                            <button type="submit" class="btn btn-primary px-4 shadow-sm">
+                                <i class="bi bi-funnel me-2"></i>Filtrar
+                            </button>
+                        </div>
+                    </form>
+
+                    <!-- Container da Tabela (Fragmento HTMX) -->
+                    <div id="tabela-container" th:fragment="conteudo">
+                        <!-- Tabela de Contratos -->
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead>
+                                    <tr class="table-light">
+                                        <th style="cursor: pointer;"
+                                            th:attr="hx-get=@{/admin/contratos(page=${contratosPage.number}, size=${currentSize}, sort='id,' + (${sortField == 'id' and sortDir == 'asc'} ? 'desc' : 'asc'), servidor=${servidor}, matricula=${matricula}, dataInicio=${dataInicio}, dataFim=${dataFim}, valorMin=${valorMin}, valorMax=${valorMax})}"
+                                            hx-target="#tabela-container"
+                                            hx-push-url="true" class="py-3">
+                                            ID
+                                            <i th:if="${sortField == 'id'}" th:class="${sortDir == 'asc' ? 'bi bi-arrow-up' : 'bi bi-arrow-down'}"></i>
+                                        </th>
+                                        <th style="cursor: pointer;"
+                                            th:attr="hx-get=@{/admin/contratos(page=${contratosPage.number}, size=${currentSize}, sort='servidor.usuario.nome,' + (${sortField == 'servidor.usuario.nome' and sortDir == 'asc'} ? 'desc' : 'asc'), servidor=${servidor}, matricula=${matricula}, dataInicio=${dataInicio}, dataFim=${dataFim}, valorMin=${valorMin}, valorMax=${valorMax})}"
+                                            hx-target="#tabela-container"
+                                            hx-push-url="true" class="py-3">
+                                            Servidor / CPF
+                                            <i th:if="${sortField == 'servidor.usuario.nome'}" th:class="${sortDir == 'asc' ? 'bi bi-arrow-up' : 'bi bi-arrow-down'}"></i>
+                                        </th>
+                                        <th style="cursor: pointer;"
+                                            th:attr="hx-get=@{/admin/contratos(page=${contratosPage.number}, size=${currentSize}, sort='servidor.matricula,' + (${sortField == 'servidor.matricula' and sortDir == 'asc'} ? 'desc' : 'asc'), servidor=${servidor}, matricula=${matricula}, dataInicio=${dataInicio}, dataFim=${dataFim}, valorMin=${valorMin}, valorMax=${valorMax})}"
+                                            hx-target="#tabela-container"
+                                            hx-push-url="true" class="py-3">
+                                            Matrícula
+                                            <i th:if="${sortField == 'servidor.matricula'}" th:class="${sortDir == 'asc' ? 'bi bi-arrow-up' : 'bi bi-arrow-down'}"></i>
+                                        </th>
+                                        <th style="cursor: pointer;"
+                                            th:attr="hx-get=@{/admin/contratos(page=${contratosPage.number}, size=${currentSize}, sort='valorSolicitado,' + (${sortField == 'valorSolicitado' and sortDir == 'asc'} ? 'desc' : 'asc'), servidor=${servidor}, matricula=${matricula}, dataInicio=${dataInicio}, dataFim=${dataFim}, valorMin=${valorMin}, valorMax=${valorMax})}"
+                                            hx-target="#tabela-container"
+                                            hx-push-url="true" class="py-3 text-end">
+                                            Valor Solicitado
+                                            <i th:if="${sortField == 'valorSolicitado'}" th:class="${sortDir == 'asc' ? 'bi bi-arrow-up' : 'bi bi-arrow-down'}"></i>
+                                        </th>
+                                        <th class="py-3 text-center">Taxa</th>
+                                        <th class="py-3 text-center">Parcelas</th>
+                                        <th style="cursor: pointer;"
+                                            th:attr="hx-get=@{/admin/contratos(page=${contratosPage.number}, size=${currentSize}, sort='valorTotalFinanciado,' + (${sortField == 'valorTotalFinanciado' and sortDir == 'asc'} ? 'desc' : 'asc'), servidor=${servidor}, matricula=${matricula}, dataInicio=${dataInicio}, dataFim=${dataFim}, valorMin=${valorMin}, valorMax=${valorMax})}"
+                                            hx-target="#tabela-container"
+                                            hx-push-url="true" class="py-3 text-end">
+                                            Total Financiado
+                                            <i th:if="${sortField == 'valorTotalFinanciado'}" th:class="${sortDir == 'asc' ? 'bi bi-arrow-up' : 'bi bi-arrow-down'}"></i>
+                                        </th>
+                                        <th class="py-3 text-center">Status</th>
+                                        <th style="cursor: pointer;"
+                                            th:attr="hx-get=@{/admin/contratos(page=${contratosPage.number}, size=${currentSize}, sort='dataSolicitacao,' + (${sortField == 'dataSolicitacao' and sortDir == 'asc'} ? 'desc' : 'asc'), servidor=${servidor}, matricula=${matricula}, dataInicio=${dataInicio}, dataFim=${dataFim}, valorMin=${valorMin}, valorMax=${valorMax})}"
+                                            hx-target="#tabela-container"
+                                            hx-push-url="true" class="py-3 text-center">
+                                            Data Solicitação
+                                            <i th:if="${sortField == 'dataSolicitacao'}" th:class="${sortDir == 'asc' ? 'bi bi-arrow-up' : 'bi bi-arrow-down'}"></i>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="contrato : ${contratosPage.content}">
+                                        <td th:text="${'#' + contrato.id}" class="fw-bold text-muted">-</td>
+                                        <td>
+                                            <div class="fw-semibold text-dark" th:text="${contrato.servidor.usuario.nome}">-</div>
+                                            <small class="text-muted" th:text="${contrato.servidor.usuario.cpf}">-</small>
+                                        </td>
+                                        <td th:text="${contrato.servidor.matricula}">-</td>
+                                        <td class="text-end fw-semibold text-primary">
+                                            R$ <span th:text="${#numbers.formatDecimal(contrato.valorSolicitado, 1, 'POINT', 2, 'COMMA')}">0,00</span>
+                                        </td>
+                                        <td class="text-center" th:text="${contrato.taxaJurosMes + '%'}">-</td>
+                                        <td class="text-center">
+                                            <span th:text="${contrato.quantidadeParcelas + 'x'}">-</span>
+                                            <small class="text-muted d-block">R$ <span th:text="${#numbers.formatDecimal(contrato.valorParcela, 1, 'POINT', 2, 'COMMA')}">0,00</span></small>
+                                        </td>
+                                        <td class="text-end fw-semibold">
+                                            R$ <span th:text="${#numbers.formatDecimal(contrato.valorTotalFinanciado, 1, 'POINT', 2, 'COMMA')}">0,00</span>
+                                        </td>
+                                        <td class="text-center">
+                                            <span th:if="${contrato.status.name() == 'DIGITADO'}" class="badge bg-secondary px-2 py-1.5 rounded">Digitado</span>
+                                            <span th:if="${contrato.status.name() == 'AGUARDANDO_AVERBACAO'}" class="badge bg-warning text-dark px-2 py-1.5 rounded">Aguardando Averbação</span>
+                                            <span th:if="${contrato.status.name() == 'AVERBADO'}" class="badge bg-success px-2 py-1.5 rounded">Averbado</span>
+                                            <span th:if="${contrato.status.name() == 'REPROVADO'}" class="badge bg-danger px-2 py-1.5 rounded">Reprovado</span>
+                                            <span th:if="${contrato.status.name() == 'QUITADO'}" class="badge bg-info text-dark px-2 py-1.5 rounded">Quitado</span>
+                                        </td>
+                                        <td class="text-center text-muted" th:text="${#temporals.format(contrato.dataSolicitacao, 'dd/MM/yyyy HH:mm')}">-</td>
+                                    </tr>
+                                    <tr th:if="${contratosPage.isEmpty()}">
+                                        <td colspan="9" class="text-center py-5 text-muted">
+                                            <i class="bi bi-file-earmark-text d-block fs-1 mb-2 text-black-50"></i>
+                                            Nenhum contrato encontrado.
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Paginação -->
+                        <div class="d-flex justify-content-between align-items-center mt-3" th:if="${!contratosPage.isEmpty()}">
+                            <div>
+                                <p class="mb-0 text-muted">
+                                    Mostrando <span class="fw-bold" th:text="${contratosPage.number * contratosPage.size + 1}">1</span> a 
+                                    <span class="fw-bold" th:text="${contratosPage.number * contratosPage.size + contratosPage.numberOfElements}">10</span> de 
+                                    <span class="fw-bold" th:text="${contratosPage.totalElements}">100</span> registros
+                                </p>
+                            </div>
+                            <nav aria-label="Page navigation">
+                                <ul class="pagination mb-0">
+                                    <li class="page-item" th:classappend="${contratosPage.first} ? 'disabled'">
+                                        <a class="page-link" href="javascript:void(0)"
+                                           th:attr="hx-get=@{/admin/contratos(page=${contratosPage.number - 1}, size=${currentSize}, sort=${sortField} + ',' + ${sortDir}, servidor=${servidor}, matricula=${matricula}, dataInicio=${dataInicio}, dataFim=${dataFim}, valorMin=${valorMin}, valorMax=${valorMax})}"
+                                           hx-target="#tabela-container" 
+                                           hx-push-url="true"
+                                           aria-label="Previous">
+                                            <span aria-hidden="true">&laquo;</span>
+                                        </a>
+                                    </li>
+                                    
+                                    <li class="page-item" th:each="i : ${#numbers.sequence(0, contratosPage.totalPages - 1)}"
+                                        th:classappend="${i == contratosPage.number} ? 'active'">
+                                        <a class="page-link" href="javascript:void(0)" th:text="${i + 1}"
+                                           th:attr="hx-get=@{/admin/contratos(page=${i}, size=${currentSize}, sort=${sortField} + ',' + ${sortDir}, servidor=${servidor}, matricula=${matricula}, dataInicio=${dataInicio}, dataFim=${dataFim}, valorMin=${valorMin}, valorMax=${valorMax})}"
+                                           hx-target="#tabela-container" 
+                                           hx-push-url="true">1</a>
+                                    </li>
+
+                                    <li class="page-item" th:classappend="${contratosPage.last} ? 'disabled'">
+                                        <a class="page-link" href="javascript:void(0)"
+                                           th:attr="hx-get=@{/admin/contratos(page=${contratosPage.number + 1}, size=${currentSize}, sort=${sortField} + ',' + ${sortDir}, servidor=${servidor}, matricula=${matricula}, dataInicio=${dataInicio}, dataFim=${dataFim}, valorMin=${valorMin}, valorMax=${valorMax})}"
+                                           hx-target="#tabela-container" 
+                                           hx-push-url="true"
+                                           aria-label="Next">
+                                            <span aria-hidden="true">&raquo;</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </nav>
+                        </div>
+                    </div> <!-- Fim do Fragmento -->
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

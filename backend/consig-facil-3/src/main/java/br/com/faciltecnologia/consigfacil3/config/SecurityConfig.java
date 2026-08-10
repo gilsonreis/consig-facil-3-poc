@@ -16,6 +16,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
@@ -28,10 +29,11 @@ public class SecurityConfig {
 
     @Bean
     @Order(1) // Executa primeiro
-    public SecurityFilterChain apiFilterChain(HttpSecurity http) {
+    public SecurityFilterChain apiFilterChain(HttpSecurity http) throws Exception {
         return http
                 // Intercepta APENAS rotas que começam com /api/v1
                 .securityMatcher("/api/v1/**", "/v3/api-docs/**", "/swagger-ui/**")
+                .cors(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
                 // Totalmente Stateless
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -49,8 +51,9 @@ public class SecurityConfig {
     // ==========================================
     @Bean
     @Order(2) // Executa se não for rota da API
-    public SecurityFilterChain adminFilterChain(HttpSecurity http) {
+    public SecurityFilterChain adminFilterChain(HttpSecurity http) throws Exception {
         return http
+                .cors(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
                 // Deixa o Spring gerenciar a sessão (Stateful) para o Thymeleaf
                 .authorizeHttpRequests(req -> {

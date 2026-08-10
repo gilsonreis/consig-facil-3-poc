@@ -1,0 +1,5 @@
+@if (authService.currentUser(); as user) {
+  <span [class]="customClass">{{ user.nome }}</span>
+} @else {
+  <span class="animate-pulse bg-slate-200 rounded block min-w-[100px] min-h-[1em]" [class]="customClass"></span>
+}

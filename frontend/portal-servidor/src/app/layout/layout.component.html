@@ -1,0 +1,144 @@
+<div class="min-h-screen bg-slate-50 flex flex-col">
+  <!-- Navbar -->
+  <nav class="bg-white shadow-sm border-b border-slate-200 sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between h-16">
+        <!-- Esquerda: Logo -->
+        <div class="flex items-center">
+          <a routerLink="/dashboard" class="flex-shrink-0 flex items-center">
+            <div class="h-8 w-32 bg-blue-600" style="-webkit-mask: url('/images/logo_consigfacil.svg') no-repeat center / contain; mask: url('/images/logo_consigfacil.svg') no-repeat center / contain;"></div>
+          </a>
+        </div>
+
+        <!-- Centro: Links (Desktop) -->
+        <div class="hidden md:flex items-center space-x-8">
+          <a routerLink="/dashboard" 
+             routerLinkActive="text-blue-600 border-blue-600 font-semibold" 
+             #rlaDashboard="routerLinkActive"
+             [class.border-transparent]="!rlaDashboard.isActive"
+             [class.text-slate-600]="!rlaDashboard.isActive"
+             [routerLinkActiveOptions]="{exact: true}"
+             class="inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium hover:text-slate-900 hover:border-slate-300 h-16 transition-colors duration-200">
+             Início
+          </a>
+          <a routerLink="/simular" 
+             routerLinkActive="text-blue-600 border-blue-600 font-semibold" 
+             #rlaSimular="routerLinkActive"
+             [class.border-transparent]="!rlaSimular.isActive"
+             [class.text-slate-600]="!rlaSimular.isActive"
+             class="inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium hover:text-slate-900 hover:border-slate-300 h-16 transition-colors duration-200">
+             Simular
+          </a>
+          <a routerLink="/extrato" 
+             routerLinkActive="text-blue-600 border-blue-600 font-semibold" 
+             #rlaExtrato="routerLinkActive"
+             [class.border-transparent]="!rlaExtrato.isActive"
+             [class.text-slate-600]="!rlaExtrato.isActive"
+             class="inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium hover:text-slate-900 hover:border-slate-300 h-16 transition-colors duration-200">
+             Extrato
+          </a>
+        </div>
+
+        <!-- Direita: Perfil/Logout (Desktop) -->
+        <div class="hidden md:flex items-center space-x-4">
+          <div class="flex items-center gap-3 pr-4 border-r border-slate-200">
+            @if (authService.currentUser(); as user) {
+              <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center font-bold text-sm">
+                {{ user.nome.charAt(0) }}
+              </div>
+            } @else {
+              <div class="w-8 h-8 rounded-full bg-slate-200 animate-pulse"></div>
+            }
+            <app-user-name customClass="text-sm font-medium text-slate-700 hidden md:block"></app-user-name>
+          </div>
+          <button (click)="logout()" 
+                  class="flex items-center gap-2 text-slate-500 hover:text-red-600 font-medium text-sm transition-colors duration-200 px-3 py-2 rounded-lg hover:bg-slate-50">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15M12 9l-3 3m0 0 3 3m-3-3h12.75" />
+            </svg>
+            Sair
+          </button>
+        </div>
+
+        <!-- Hamburger Button (Mobile) -->
+        <div class="flex items-center md:hidden">
+          <button (click)="toggleMenu()" 
+                  class="inline-flex items-center justify-center p-2 rounded-xl text-slate-500 hover:text-slate-900 hover:bg-slate-100 focus:outline-none transition-colors duration-200">
+            @if (isMobileMenuOpen()) {
+              <!-- Icon: X -->
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+              </svg>
+            } @else {
+              <!-- Icon: Hamburger -->
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+              </svg>
+            }
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile Menu -->
+    @if (isMobileMenuOpen()) {
+      <div class="md:hidden border-t border-slate-200 bg-white shadow-inner py-3 px-4 space-y-2">
+        <div class="flex items-center gap-3 px-4 py-3 bg-slate-50 rounded-xl mb-2">
+          @if (authService.currentUser(); as user) {
+            <div class="w-10 h-10 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center font-bold text-base shadow-sm">
+              {{ user.nome.charAt(0) }}
+            </div>
+            <div class="flex flex-col">
+              <app-user-name customClass="text-sm font-semibold text-slate-800"></app-user-name>
+              <span class="text-xs text-slate-500">{{ user.email }}</span>
+            </div>
+          } @else {
+            <div class="w-10 h-10 rounded-full bg-slate-200 animate-pulse"></div>
+            <div class="space-y-1.5 flex-1">
+              <app-user-name customClass="text-sm font-semibold text-slate-800"></app-user-name>
+              <div class="h-3 bg-slate-200 rounded w-1/2 animate-pulse"></div>
+            </div>
+          }
+        </div>
+         <a routerLink="/dashboard" 
+            routerLinkActive="bg-blue-50 text-blue-600 font-semibold"
+            #rlaMobileDashboard="routerLinkActive"
+            [class.text-slate-600]="!rlaMobileDashboard.isActive"
+            [routerLinkActiveOptions]="{exact: true}"
+            (click)="isMobileMenuOpen.set(false)"
+            class="block px-4 py-2.5 rounded-xl text-base font-medium hover:bg-slate-50 hover:text-slate-900 transition-all">
+            Início
+         </a>
+         <a routerLink="/simular" 
+            routerLinkActive="bg-blue-50 text-blue-600 font-semibold"
+            #rlaMobileSimular="routerLinkActive"
+            [class.text-slate-600]="!rlaMobileSimular.isActive"
+            (click)="isMobileMenuOpen.set(false)"
+            class="block px-4 py-2.5 rounded-xl text-base font-medium hover:bg-slate-50 hover:text-slate-900 transition-all">
+            Simular
+         </a>
+         <a routerLink="/extrato" 
+            routerLinkActive="bg-blue-50 text-blue-600 font-semibold"
+            #rlaMobileExtrato="routerLinkActive"
+            [class.text-slate-600]="!rlaMobileExtrato.isActive"
+            (click)="isMobileMenuOpen.set(false)"
+            class="block px-4 py-2.5 rounded-xl text-base font-medium hover:bg-slate-50 hover:text-slate-900 transition-all">
+            Extrato
+         </a>
+        <hr class="border-slate-100 my-2">
+        <button (click)="logout(); isMobileMenuOpen.set(false)"
+                class="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-base font-medium text-red-600 hover:bg-red-50 transition-all">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15M12 9l-3 3m0 0 3 3m-3-3h12.75" />
+          </svg>
+          Sair
+        </button>
+      </div>
+    }
+  </nav>
+
+  <!-- Content Miolo -->
+  <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <router-outlet></router-outlet>
+  </main>
+</div>

@@ -4,27 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ConsigFácil Admin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
     <script src="https://unpkg.com/htmx.org@1.9.10"></script>
     <style>
-        body {
-            font-family: 'Roboto', sans-serif;
-            background-color: #f4f6f9;
-        }
         #wrapper {
             display: flex;
         }
         #sidebar-wrapper {
-            min-height: 100vh;
             margin-left: -15rem;
             transition: margin .25s ease-out;
-            background-color: #343a40; /* Dark sidebar */
-        }
-        #sidebar-wrapper .sidebar-heading {
-            padding: 0.875rem 1.25rem;
-            font-size: 1.2rem;
-            color: #f8f9fa;
         }
         #sidebar-wrapper .list-group {
             width: 15rem;
@@ -47,54 +40,28 @@
                 margin-left: -15rem;
             }
         }
-        .list-group-item {
-            background-color: #343a40;
-            color: #adb5bd;
-            border: none;
-        }
-        .list-group-item:hover {
-            color: #fff;
-            background-color: #495057;
-        }
-        .list-group-item.active {
-            background-color: #0d6efd;
-            color: #fff;
-        }
-        .navbar-dark .navbar-nav .nav-link {
-            color: rgba(255,255,255,.75);
-        }
-        .navbar-dark .navbar-nav .nav-link:hover {
-            color: #fff;
-        }
-        .card-icon {
-            font-size: 2.5rem;
-            opacity: 0.3;
-            position: absolute;
-            right: 15px;
-            top: 15px;
-        }
     </style>
 </head>
 <body>
     <div class="d-flex" id="wrapper">
         <!-- Sidebar -->
-        <div class="bg-dark border-right" id="sidebar-wrapper">
-            <div class="sidebar-heading text-center py-4">
+        <div id="sidebar-wrapper" class="d-flex flex-column">
+            <div class="sidebar-heading text-center">
                 <img th:src="@{/images/logo_consigfacil.svg}" alt="Logo" style="width: 120px; filter: brightness(0) invert(1);">
-                <div class="mt-2" style="font-size: 0.9rem; font-weight: bold; color: #adb5bd;">ADMIN PANEL</div>
+                <div class="mt-2" style="font-size: 0.75rem; font-weight: 700; letter-spacing: 0.1em; color: #64748b;">ADMIN PANEL</div>
             </div>
-            <div class="list-group list-group-flush">
+            <div class="list-group list-group-flush flex-grow-1">
                 <a th:href="@{/admin/dashboard}" class="list-group-item list-group-item-action">
-                    <i class="bi bi-speedometer2 me-2"></i>Dashboard
+                    <i class="bi bi-speedometer2 me-3"></i>Dashboard
                 </a>
-                <a href="#" class="list-group-item list-group-item-action">
-                    <i class="bi bi-file-earmark-check me-2"></i>Aprovar Contratos
+                <a th:href="@{/admin/contratos}" class="list-group-item list-group-item-action">
+                    <i class="bi bi-file-earmark-text me-3"></i>Contratos
                 </a>
                 <a th:href="@{/admin/servidores}" class="list-group-item list-group-item-action">
-                    <i class="bi bi-people me-2"></i>Servidores
+                    <i class="bi bi-people me-3"></i>Servidores
                 </a>
-                <a th:href="@{/admin/auth/logout}" class="list-group-item list-group-item-action mt-auto border-top border-secondary">
-                    <i class="bi bi-box-arrow-left me-2"></i>Sair
+                <a th:href="@{/admin/auth/logout}" class="list-group-item list-group-item-action mt-auto mb-3">
+                    <i class="bi bi-box-arrow-left me-3"></i>Sair
                 </a>
             </div>
         </div>
@@ -102,9 +69,9 @@
 
         <!-- Page Content -->
         <div id="page-content-wrapper">
-            <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom">
+            <nav class="navbar navbar-expand-lg">
                 <div class="container-fluid">
-                    <button class="btn btn-outline-secondary" id="sidebarToggle">
+                    <button id="sidebarToggle">
                         <i class="bi bi-list"></i>
                     </button>
                     <div class="collapse navbar-collapse" id="navbarSupportedContent">
@@ -137,6 +104,18 @@
     <script>
         document.getElementById('sidebarToggle').addEventListener('click', function() {
             document.getElementById('wrapper').classList.toggle('toggled');
+        });
+
+        // Dynamic active state for Sidebar
+        document.addEventListener("DOMContentLoaded", function() {
+            const currentPath = window.location.pathname;
+            const menuLinks = document.querySelectorAll("#sidebar-wrapper .list-group-item");
+            menuLinks.forEach(link => {
+                const href = link.getAttribute("href");
+                if (href && href !== '#' && (currentPath === href || (href !== "/admin/dashboard" && currentPath.startsWith(href)))) {
+                    link.classList.add("active");
+                }
+            });
         });
     </script>
 </body>

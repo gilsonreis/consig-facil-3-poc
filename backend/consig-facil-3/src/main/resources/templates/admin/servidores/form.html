@@ -11,9 +11,9 @@
                 </ol>
             </nav>
 
-            <div class="card shadow-sm mb-4">
-                <div class="card-header bg-light py-3">
-                    <h5 class="mb-0 text-primary fw-bold">Cadastro de Novo Servidor</h5>
+            <div class="card mb-4 border-0">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0 text-dark fw-bold">Cadastro de Novo Servidor</h5>
                 </div>
                 <div class="card-body">
                     <form th:action="@{/admin/servidores/novo}" method="POST" th:object="${cadastrarServidorInput}">
@@ -51,7 +51,7 @@
                                 <div th:replace="~{admin/servidores/fragmentos/form-dados-pessoais :: conteudo}"></div>
                             </div>
 
-                            <hr class="my-4">
+                            <hr class="my-4" style="border-color: var(--border-color);">
                             <h6 class="text-secondary fw-bold mb-3">Dados do Vínculo</h6>
 
                             <div class="col-md-6">
@@ -72,7 +72,7 @@
 
                         <div class="mt-4 text-end">
                             <a th:href="@{/admin/servidores}" class="btn btn-outline-secondary me-2">Cancelar</a>
-                            <button type="submit" class="btn btn-primary px-4">
+                            <button type="submit" class="btn btn-primary px-4 shadow-sm">
                                 <i class="bi bi-save me-2"></i>Salvar Servidor
                             </button>
                         </div>

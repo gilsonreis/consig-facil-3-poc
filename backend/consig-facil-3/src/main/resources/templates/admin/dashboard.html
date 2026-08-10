@@ -2,36 +2,34 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{admin/layout/master :: layout(~{::main})}">
 <body>
     <main>
-        <div class="container-fluid" id="main-content">
-            <h1 class="mt-4">Bem-vindo ao ConsigFácil Admin!</h1>
-            <p class="text-muted">Gestão centralizada de contratos e servidores.</p>
+        <div class="container-fluid py-4" id="main-content">
+            <div class="d-flex justify-content-between align-items-center flex-wrap mb-4">
+                <div>
+                    <h3 class="mb-1 fw-bold text-dark">Painel Administrativo</h3>
+                    <p class="text-muted mb-0">Bem-vindo de volta! Gestão centralizada de contratos e servidores.</p>
+                </div>
+            </div>
 
-            <div class="row mt-4">
+            <div class="row">
                 <div class="col-lg-4 col-md-6 mb-4">
-                    <div class="card text-white bg-primary position-relative overflow-hidden">
-                        <div class="card-body">
-                            <h5 class="card-title">Contratos Pendentes</h5>
-                            <p class="card-text fs-3">15</p>
-                            <i class="bi bi-clock-history card-icon"></i>
-                        </div>
+                    <div class="card metric-card metric-card-bg-primary">
+                        <h5 class="card-title">Contratos Pendentes</h5>
+                        <p class="card-value">15</p>
+                        <i class="bi bi-clock-history card-icon"></i>
                     </div>
                 </div>
                 <div class="col-lg-4 col-md-6 mb-4">
-                    <div class="card text-white bg-success position-relative overflow-hidden">
-                        <div class="card-body">
-                            <h5 class="card-title">Volume Aprovado</h5>
-                            <p class="card-text fs-3">R$ 1.250.000,00</p>
-                            <i class="bi bi-currency-dollar card-icon"></i>
-                        </div>
+                    <div class="card metric-card metric-card-bg-success">
+                        <h5 class="card-title">Volume Aprovado</h5>
+                        <p class="card-value">R$ 1.250.000,00</p>
+                        <i class="bi bi-currency-dollar card-icon"></i>
                     </div>
                 </div>
                 <div class="col-lg-4 col-md-6 mb-4">
-                    <div class="card text-white bg-info position-relative overflow-hidden">
-                        <div class="card-body">
-                            <h5 class="card-title">Servidores Ativos</h5>
-                            <p class="card-text fs-3">250</p>
-                            <i class="bi bi-people-fill card-icon"></i>
-                        </div>
+                    <div class="card metric-card metric-card-bg-info">
+                        <h5 class="card-title">Servidores Ativos</h5>
+                        <p class="card-value">250</p>
+                        <i class="bi bi-people-fill card-icon"></i>
                     </div>
                 </div>
             </div>

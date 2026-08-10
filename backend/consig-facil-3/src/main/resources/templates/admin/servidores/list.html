@@ -10,9 +10,9 @@
                 </ol>
             </nav>
 
-            <div class="card shadow-sm mb-4">
-                <div class="card-header bg-light d-flex justify-content-between align-items-center py-3">
-                    <h5 class="mb-0 text-primary fw-bold">Listagem de Servidores</h5>
+            <div class="card mb-4 border-0">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0 text-dark fw-bold">Listagem de Servidores</h5>
                 </div>
                 <div class="card-body">
                     <!-- Toolbar -->
@@ -25,7 +25,7 @@
                                   hx-trigger="submit, change from:#sizeSelect">
                                 <input type="hidden" name="sort" th:value="${sortField + ',' + sortDir}">
                                 <div class="col-auto">
-                                    <div class="input-group">
+                                    <div class="input-group" style="min-width: 320px;">
                                         <input type="text" name="search" class="form-control" placeholder="Buscar por nome, CPF ou matrícula..." th:value="${search}">
                                         <button class="btn btn-outline-primary" type="submit">
                                             <i class="bi bi-search"></i>
@@ -46,7 +46,7 @@
                             </form>
                         </div>
                         <div class="col-md-4 text-end">
-                            <a th:href="@{/admin/servidores/novo}" class="btn btn-primary">
+                            <a th:href="@{/admin/servidores/novo}" class="btn btn-primary shadow-sm">
                                 <i class="bi bi-person-plus-fill me-2"></i>Novo Servidor
                             </a>
                         </div>
@@ -56,8 +56,8 @@
                     <div id="tabela-container" th:fragment="tabela-fragment">
                         <!-- Table -->
                         <div class="table-responsive">
-                            <table class="table table-bordered table-striped table-hover align-middle">
-                                <thead class="table-dark">
+                            <table class="table table-hover align-middle">
+                                <thead>
                                     <tr>
                                         <th style="cursor: pointer;"
                                             th:attr="hx-get=@{/admin/servidores(search=${search}, size=${currentSize}, sort='u.nome,' + (${sortField == 'u.nome' and sortDir == 'asc'} ? 'desc' : 'asc'))}"
@@ -79,28 +79,31 @@
                                 </thead>
                                 <tbody>
                                     <tr th:each="servidor : ${servidoresPage.content}">
-                                        <td th:text="${servidor.nome}">-</td>
+                                        <td th:text="${servidor.nome}" class="fw-500">-</td>
                                         <td th:text="${servidor.cpf}">-</td>
                                         <td class="text-center" th:text="${servidor.quantidadeMatriculas}">0</td>
                                         <td class="text-center">
-                                            <button class="btn btn-sm btn-outline-info me-1" 
+                                            <button class="btn btn-sm btn-outline-primary me-1 border-0 bg-transparent" 
                                                     title="Visualizar"
                                                     th:attr="hx-get=@{/admin/servidores/{cpf}/matriculas(cpf=${servidor.cpf})}"
                                                     hx-target="#modalVisualizarBody"
                                                     data-bs-toggle="modal" 
                                                     data-bs-target="#modalVisualizar"
                                                     onclick="event.stopPropagation();">
-                                                <i class="bi bi-eye"></i>
+                                                <i class="bi bi-eye-fill"></i>
                                             </button>
-                                            <button class="btn btn-sm btn-outline-danger" 
+                                            <button class="btn btn-sm btn-outline-danger border-0 bg-transparent" 
                                                     title="Excluir"
                                                     onclick="event.stopPropagation(); if(confirm('Deseja realmente excluir este servidor?')) { /* action logic here */ }">
-                                                <i class="bi bi-trash"></i>
+                                                <i class="bi bi-trash-fill"></i>
                                             </button>
                                         </td>
                                     </tr>
                                     <tr th:if="${servidoresPage.isEmpty()}">
-                                        <td colspan="4" class="text-center py-4 text-muted">Nenhum servidor encontrado.</td>
+                                        <td colspan="4" class="text-center py-5 text-muted">
+                                            <i class="bi bi-people-fill d-block fs-1 mb-2 text-black-50"></i>
+                                            Nenhum servidor encontrado.
+                                        </td>
                                     </tr>
                                 </tbody>
                             </table>

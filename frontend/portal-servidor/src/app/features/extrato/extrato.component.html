@@ -1,0 +1,269 @@
+<div class="space-y-8 animate-in fade-in duration-300">
+  
+  <!-- Header / Título -->
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div>
+      <h1 class="text-3xl font-bold text-slate-800 tracking-tight">Meus Empréstimos</h1>
+      <p class="text-slate-500 mt-1">Consulte seus contratos ativos, margem consumida e histórico de parcelas.</p>
+    </div>
+    
+    <!-- Filtros Rápidos -->
+    <div class="flex items-center gap-3">
+      <!-- Input de Data -->
+      <div class="relative">
+        <input 
+          type="date" 
+          [formControl]="dataFiltro"
+          class="bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all cursor-pointer"
+        />
+      </div>
+
+      <!-- Limpar Filtro se ativo -->
+      @if (dataSelecionada()) {
+        <button 
+          (click)="limparFiltro()"
+          class="p-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl text-sm font-bold transition-all"
+        >
+          Limpar Filtro
+        </button>
+      }
+    </div>
+  </div>
+
+  <!-- Seleção de Vínculo Integrada -->
+  @if (servidores().length > 1) {
+    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div class="space-y-1">
+        <h3 class="font-bold text-slate-800 text-sm uppercase tracking-wider text-slate-400">Vínculo Ativo</h3>
+        <p class="text-xs text-slate-500">Altere o vínculo abaixo para consultar contratos de outros órgãos.</p>
+      </div>
+      <select 
+        (change)="onMatriculaChange($event)" 
+        class="bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all cursor-pointer min-w-[200px]"
+      >
+        @for (s of servidores(); track s.id) {
+          <option [value]="s.id" [selected]="s.id === matriculaAtiva()?.id">
+            Matrícula: {{ s.matricula }}
+          </option>
+        }
+      </select>
+    </div>
+  }
+
+  <!-- Estados da Lista -->
+  @if (loading()) {
+    
+    <!-- Skeleton Grid Loading -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      @for (x of [1, 2, 3]; track x) {
+        <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm space-y-4 animate-pulse">
+          <div class="flex justify-between items-center">
+            <div class="h-4 bg-slate-200 rounded w-1/3"></div>
+            <div class="h-6 bg-slate-200 rounded-full w-1/4"></div>
+          </div>
+          <div class="space-y-2 py-2">
+            <div class="h-8 bg-slate-200 rounded w-2/3"></div>
+            <div class="h-4 bg-slate-200 rounded w-1/2"></div>
+          </div>
+          <div class="h-10 bg-slate-200 rounded-xl w-full"></div>
+        </div>
+      }
+    </div>
+
+  } @else if (error()) {
+    
+    <div class="p-6 bg-red-50 border border-red-200 text-red-700 rounded-2xl text-center space-y-2">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-8 h-8 mx-auto text-red-500">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z" />
+      </svg>
+      <p class="font-bold">{{ error() }}</p>
+    </div>
+
+  } @else if (contratosFiltrados().length === 0) {
+    
+    <!-- Empty State -->
+    <div class="bg-white border border-slate-200 rounded-2xl py-16 px-6 text-center shadow-sm space-y-4">
+      <div class="w-16 h-16 bg-slate-50 text-slate-400 rounded-2xl flex items-center justify-center mx-auto border border-slate-100 shadow-inner">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="w-8 h-8">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
+        </svg>
+      </div>
+      <div class="space-y-1">
+        <h3 class="font-bold text-slate-800 text-lg">Nenhum empréstimo encontrado</h3>
+        <p class="text-sm text-slate-400">Não há contratos registrados ou que correspondam aos filtros selecionados.</p>
+      </div>
+    </div>
+
+  } @else {
+    
+    <!-- Grid de Cards de Contratos -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      @for (c of contratosFiltrados(); track c.id) {
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 hover:shadow-md transition-all duration-200 flex flex-col justify-between hover:border-slate-300">
+          
+          <!-- Top / Status -->
+          <div class="flex justify-between items-center mb-4">
+            <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Contrato #{{ c.id }}</span>
+            <span 
+              [class]="c.status === 'ATIVO' 
+                ? 'bg-emerald-50 text-emerald-700 border-emerald-100' 
+                : 'bg-blue-50 text-blue-700 border-blue-100'"
+              class="px-2.5 py-1 text-xs font-bold rounded-full border"
+            >
+              {{ c.status }}
+            </span>
+          </div>
+
+          <!-- Valores Centrais -->
+          <div class="space-y-1 my-3">
+            <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Valor da Parcela</p>
+            <p class="text-2xl font-black text-slate-800 tracking-tight">
+              {{ c.valorParcela | currency:'BRL':'symbol':'1.2-2' }} <span class="text-sm font-medium text-slate-500">/ mês</span>
+            </p>
+          </div>
+
+          <!-- Infos Detalhadas -->
+          <div class="border-t border-slate-100 py-3 space-y-2 text-xs font-medium text-slate-500">
+            <div class="flex justify-between">
+              <span>Valor Total Financiado</span>
+              <span class="font-bold text-slate-700">{{ c.valorTotal | currency:'BRL':'symbol':'1.2-2' }}</span>
+            </div>
+            <div class="flex justify-between">
+              <span>Prazo de Pagamento</span>
+              <span class="font-bold text-slate-700">{{ c.quantidadeParcelas }} parcelas</span>
+            </div>
+            <div class="flex justify-between">
+              <span>Data da Contratação</span>
+              <span class="font-bold text-slate-700">
+                @if (c.dataSolicitacao) {
+                  {{ c.dataSolicitacao | date:'dd/MM/yyyy' }}
+                } @else {
+                  -
+                }
+              </span>
+            </div>
+          </div>
+
+          <!-- Ação -->
+          <button 
+            type="button" 
+            (click)="abrirDetalhes(c)"
+            class="w-full mt-4 py-2.5 px-4 bg-slate-50 hover:bg-blue-50 text-slate-700 hover:text-blue-600 font-bold rounded-xl transition-all duration-200 border border-slate-200 hover:border-blue-100 text-sm flex items-center justify-center gap-2"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.2" stroke="currentColor" class="w-4 h-4">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18 9 11.25l4.306 4.306a11.95 11.95 0 0 1 5.814-5.518l2.74-1.22m0 0-5.94-2.281m5.94 2.28-2.28 5.941" />
+            </svg>
+            Ver Parcelas
+          </button>
+
+        </div>
+      }
+    </div>
+
+  }
+
+</div>
+
+<!-- Modal de Parcelas (Mock) -->
+@if (modalDetalhesAberto()) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm transition-opacity duration-300">
+    <div class="bg-white rounded-3xl shadow-2xl w-full max-w-lg p-6 border border-slate-100 mx-4 transform transition-all duration-300 animate-in zoom-in-95 duration-200">
+      
+      <!-- Cabeçalho -->
+      <div class="flex justify-between items-start border-b border-slate-100 pb-4">
+        <div>
+          <h3 class="text-xl font-extrabold text-slate-800 tracking-tight">Cronograma de Parcelas</h3>
+          <p class="text-xs text-slate-400 mt-0.5">Contrato #{{ contratoSelecionado()?.id }}</p>
+        </div>
+        <button 
+          (click)="fecharDetalhes()" 
+          class="p-1 rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-700 transition-all"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <!-- Resumo Financeiro & Progresso -->
+      <div class="my-5 p-4 bg-slate-50 rounded-2xl border border-slate-100 space-y-4">
+        <div class="grid grid-cols-2 gap-4 text-center">
+          <div>
+            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Total do Contrato</span>
+            <p class="text-base font-black text-slate-800">
+              {{ contratoSelecionado()?.valorTotal | currency:'BRL':'symbol':'1.2-2' }}
+            </p>
+          </div>
+          <div>
+            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Valor da Parcela</span>
+            <p class="text-base font-black text-blue-600">
+              {{ contratoSelecionado()?.valorParcela | currency:'BRL':'symbol':'1.2-2' }}
+            </p>
+          </div>
+        </div>
+
+        <!-- Barra de Progresso Realista -->
+        <div class="space-y-1.5">
+          <div class="flex justify-between text-xs font-semibold text-slate-500">
+            <span>Progresso da Quitação</span>
+            <span>{{ pagasCount() }} de {{ contratoSelecionado()?.quantidadeParcelas }} pagas</span>
+          </div>
+          <div class="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
+            <div 
+              class="bg-emerald-500 h-full rounded-full transition-all duration-500" 
+              [style.width.%]="(pagasCount() / contratoSelecionado()?.quantidadeParcelas) * 100"
+            ></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Título de Seção -->
+      <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Detalhamento Mensal</h4>
+
+      <!-- Lista de Parcelas Rolar -->
+      <div class="overflow-y-auto max-h-64 pr-1 space-y-2 scrollbar-thin">
+        @for (p of parcelas(); track p.numero) {
+          <div class="flex justify-between items-center p-3 rounded-xl border border-slate-100 bg-white hover:bg-slate-50/50 transition-all text-sm font-medium">
+            
+            <div class="flex items-center gap-3">
+              <span class="w-6 h-6 rounded-lg bg-slate-100 text-slate-500 flex items-center justify-center font-bold text-xs">
+                #{{ p.numero }}
+              </span>
+              <div class="flex flex-col">
+                <span class="text-xs text-slate-400">Vencimento</span>
+                <span class="text-slate-700 font-semibold">{{ p.dataVencimento | date:'dd/MM/yyyy' }}</span>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-4">
+              <span class="font-bold text-slate-800">
+                {{ p.valor | currency:'BRL':'symbol':'1.2-2' }}
+              </span>
+              <span 
+                [class]="p.status === 'PAGO' 
+                  ? 'bg-emerald-50 text-emerald-700 border-emerald-100' 
+                  : 'bg-amber-50 text-amber-700 border-amber-100'"
+                class="px-2 py-0.5 text-[10px] font-bold rounded-md border"
+              >
+                {{ p.status }}
+              </span>
+            </div>
+
+          </div>
+        }
+      </div>
+
+      <!-- Fechar -->
+      <div class="mt-6 border-t border-slate-100 pt-4">
+        <button 
+          type="button" 
+          (click)="fecharDetalhes()" 
+          class="w-full py-3 px-4 bg-slate-100 hover:bg-slate-200 active:bg-slate-300 text-slate-700 font-bold rounded-xl transition-all duration-200 text-sm"
+        >
+          Fechar
+        </button>
+      </div>
+
+    </div>
+  </div>
+}
